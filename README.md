@@ -1,9 +1,6 @@
 # Another Video Player
 
 
-## Home Screen
-![Home Screen](./readme/home.png)
+## Screenshot
 
-
-## Setting Screen
-![Setting Screen](./readme/settings.png)
+<img src="./readme/home.png" width="150px"/>  <img src="./readme/settings.png" width="150px"/>
