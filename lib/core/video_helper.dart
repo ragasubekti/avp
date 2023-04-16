@@ -38,7 +38,7 @@ Future<String?> generateThumbnail(String filePath) async {
 
     return FFmpegKit.executeWithArguments(ffmpegArgs).then((session) async {
       final returnCode = await session.getReturnCode();
-      logger.d(await session.getAllLogsAsString());
+      // logger.d(await session.getAllLogsAsString());
 
       if (ReturnCode.isSuccess(returnCode)) {
         return "$file.jpeg";
@@ -97,4 +97,10 @@ class VideoMetadataInfo {
   String toString() {
     return "FORMAT: $format\nDURATION: $duration\nRESOLUTION: $resolution";
   }
+}
+
+String getVideoFilename(String filePath) {
+  final splitFilePath = filePath.split("/");
+  final fileName = splitFilePath[splitFilePath.length - 1];
+  return fileName;
 }
