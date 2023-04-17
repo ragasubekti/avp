@@ -1,5 +1,6 @@
 # Another Video Player
 
+[Download](https://github.com/ragasubekti/avp/releases)
 
 ## Screenshot
 
