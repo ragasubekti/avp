@@ -1,4 +1,4 @@
-package com.example.mpvxd
+package com.ragasubekti.another_vp
 
 import io.flutter.embedding.android.FlutterActivity
 
