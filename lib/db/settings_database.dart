@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:another_vp/models/settings_model.dart';
+
+import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
+
+import 'package:another_vp/models/settings_model.dart';
 
 class SettingsDatabase {
   Future<Database>? database;
@@ -54,7 +56,6 @@ class SettingsDatabase {
 
       return settings;
     } else {
-      final findSettings = await db.query("settings_database");
       var first = findSettings.first;
 
       SettingsModel settings = SettingsModel(
@@ -66,10 +67,6 @@ class SettingsDatabase {
           alwaysMute: first['always_mute'] == 1);
 
       return settings;
-      // final returnSettingsData =
-
-      // return await db.update("settings_database", settings.toMap(),
-      //     where: "id = 1");
     }
   }
 }
