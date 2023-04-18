@@ -25,7 +25,7 @@ class SettingsModel {
     }
   }
 
-  SettingDeviceOrientation mapOrientationFromDb(int orientation) {
+  static SettingDeviceOrientation mapOrientationFromDb(int orientation) {
     switch (orientation) {
       case 1:
         return SettingDeviceOrientation.portrait;
@@ -45,5 +45,20 @@ class SettingsModel {
       'force_device_orientation': mapOrientationToDb(forceDeviceOrientation),
       'always_mute': alwaysMute,
     };
+  }
+
+  SettingsModel copyWith(
+      {bool? alwaysOpenExternal,
+      bool? isDarkMode,
+      bool? isBlackDark,
+      SettingDeviceOrientation? forceDeviceOrientation,
+      bool? alwaysMute}) {
+    return SettingsModel(
+        alwaysOpenExternal: alwaysOpenExternal ?? this.alwaysOpenExternal,
+        isDarkMode: isDarkMode ?? this.isDarkMode,
+        isBlackDark: isBlackDark ?? this.isBlackDark,
+        forceDeviceOrientation:
+            forceDeviceOrientation ?? this.forceDeviceOrientation,
+        alwaysMute: alwaysMute ?? this.alwaysMute);
   }
 }
