@@ -2,7 +2,7 @@ import 'package:ffmpeg_kit_flutter_video/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_video/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_video/return_code.dart';
 import 'package:logger/logger.dart';
-import 'package:mpvxd/core/random_string.dart';
+import 'package:another_vp/core/random_string.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -71,12 +71,32 @@ Future<String> getVideoResolution(String filePath) async {
   });
 }
 
+Future<String> getVideoFormat(String filePath) async {
+  final getVideoFormatArgs = [
+    "-v",
+    "error",
+    "-select_streams",
+    "v:0",
+    "-show_entries",
+    "stream=codec_name",
+    "-of",
+    "default=noprint_wrappers=1:nokey=1",
+    filePath
+  ];
+
+  return FFprobeKit.executeWithArguments(getVideoFormatArgs)
+      .then((value) async {
+    final format = await value.getLogsAsString();
+    return format.trim();
+  });
+}
+
 Future<VideoMetadataInfo> getVideoMetadata(String filePath) async {
   final ffprobe = await FFprobeKit.getMediaInformation(filePath);
   final mediaInfo = ffprobe.getMediaInformation();
 
-  final String format = mediaInfo!.getFormat() ?? "Unknown";
-  final int duration = double.parse(mediaInfo.getDuration() ?? "0").toInt();
+  final String format = await getVideoFormat(filePath);
+  final int duration = double.parse(mediaInfo!.getDuration() ?? "0").toInt();
   String resolution = (await getVideoResolution(filePath)).trim();
 
   return VideoMetadataInfo(format, duration, resolution);
