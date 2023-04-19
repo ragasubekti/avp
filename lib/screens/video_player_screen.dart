@@ -61,46 +61,56 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   void getVideoOrientation() {
-    final resolution = widget.videoData.resolution;
-    if (widget.settings!.forceDeviceOrientation ==
-        SettingDeviceOrientation.landscape) {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
-      return;
-    } else if (widget.settings!.forceDeviceOrientation ==
-        SettingDeviceOrientation.portrait) {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-      return;
-    }
-
-    if (resolution != "Unknown") {
-      final _resolution = resolution.split("x");
-
-      if (int.parse(_resolution[0]) <= int.parse(_resolution[1])) {
-        SystemChrome.setPreferredOrientations(
-            [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-      } else {
+    switch (widget.settings!.forceDeviceOrientation) {
+      case SettingDeviceOrientation.landscape:
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.landscapeLeft,
           DeviceOrientation.landscapeRight
         ]);
+        break;
+      case SettingDeviceOrientation.portrait:
+        SystemChrome.setPreferredOrientations(
+            [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+        break;
+      default:
+        final resolution = widget.videoData.resolution;
+        final preferredOrientations =
+            getPreferredOrientationsFromResolution(resolution);
+        SystemChrome.setPreferredOrientations(preferredOrientations);
+        break;
+    }
+  }
+
+  List<DeviceOrientation> getPreferredOrientationsFromResolution(
+      String resolution) {
+    if (resolution != "Unknown") {
+      final resolution0 = resolution.split("x");
+
+      if (int.parse(resolution0[0]) <= int.parse(resolution0[1])) {
+        return [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown];
+      } else {
+        return [
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight
+        ];
       }
     } else {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+      return [
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight
+      ];
     }
   }
 
   double getAspectRatio() {
     final resolution = widget.videoData.resolution;
+    if (resolution == "Unknown") return 16 / 9;
 
-    if (resolution != "Unknown") {
-      final _resolution = resolution.split("x");
+    final _resolution = resolution.split("x");
+    final width = int.parse(_resolution[0]);
+    final height = int.parse(_resolution[1]);
 
-      return int.parse(_resolution[0]) / int.parse(_resolution[1]);
-    }
-    return 16 / 9;
+    return width / height;
   }
 
   @override
