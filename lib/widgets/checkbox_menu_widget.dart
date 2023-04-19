@@ -1,25 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 
-class ChecboxMenuWidget extends StatelessWidget {
+enum MenuItemType { dropdown, checkbox, none }
+
+class MenuItem extends StatelessWidget {
+  bool disabled;
   bool enabled;
   final String title;
   final String subtitle;
   final IconData icon;
   final void Function() onPressed;
+  MenuItemType type;
 
-  ChecboxMenuWidget(
+  MenuItem(
       {super.key,
       required this.onPressed,
       required this.title,
       required this.subtitle,
       required this.icon,
-      this.enabled = false});
+      this.enabled = false,
+      this.disabled = false,
+      this.type = MenuItemType.none});
+
+  Widget renderRightMenu() {
+    switch (type) {
+      case MenuItemType.dropdown:
+        return Container();
+      case MenuItemType.checkbox:
+        return renderCheckbox();
+      default:
+        return Container();
+    }
+  }
+
+  Widget renderCheckbox() {
+    return Checkbox(value: enabled, onChanged: (v) {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onPressed,
+      onTap: !disabled ? onPressed : null,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -33,11 +54,14 @@ class ChecboxMenuWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title).bold(),
-                  Text(subtitle).fontSize(12).textColor(Colors.black54)
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  )
                 ],
               ),
             ),
-            Checkbox(value: enabled, onChanged: (v) {})
+            renderRightMenu()
           ],
         ),
       ),

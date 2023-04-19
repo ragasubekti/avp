@@ -10,8 +10,7 @@ Future<List<String>> scanFiles(
   List<String> thumbnailPath = [];
   final vd = VideoDatabase();
   final db = await vd.initializeDatabase();
-
-  var path = await ExternalPath.getExternalStorageDirectories();
+  final path = await ExternalPath.getExternalStorageDirectories();
 
   for (var d in path) {
     Directory dir = Directory(d);
@@ -32,8 +31,9 @@ Future<List<String>> scanFiles(
           if (findVideoId <= 0) {
             String directoryPath = getDirectoryPath(item.path);
             try {
-              VideoMetadataInfo metadata = await getVideoMetadata(item.path);
-              String videoThumbnail =
+              final VideoMetadataInfo metadata =
+                  await getVideoMetadata(item.path);
+              final String videoThumbnail =
                   (await generateThumbnail(item.path)) ?? "";
 
               final VideoDatabaseModel videoDetail = VideoDatabaseModel(
