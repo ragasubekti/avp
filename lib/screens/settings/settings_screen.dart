@@ -1,5 +1,6 @@
 import 'package:avp/constants/settings.dart';
 import 'package:avp/screens/settings/settings_screen_orientation_widget.dart';
+import 'package:avp/screens/settings/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -44,6 +45,10 @@ class SettingsController extends GetxController {
       case SettingsConstant.DARK_MODE:
         isDarkMode(!isDarkMode.value);
         box.write(type, isDarkMode.value);
+
+        Get.changeThemeMode(
+          isDarkMode.value ? ThemeMode.dark : ThemeMode.light,
+        );
         break;
       case SettingsConstant.BLACK_MODE:
         isBlackMode(!isBlackMode.value);
@@ -58,6 +63,8 @@ class SettingsController extends GetxController {
         box.write(type, isAlwaysExternal.value);
         break;
     }
+
+    Get.find<SettingService>().updateValues();
   }
 
   onScreenOrientationPressed(BuildContext context) {
@@ -72,6 +79,8 @@ class SettingsController extends GetxController {
   changeScreenOrientation(int value, BuildContext context) {
     screenOrientation(value);
     box.write(SettingsConstant.SCREEN_ORIENTATION, value);
+
+    Get.find<SettingService>().updateValues();
     Navigator.pop(context);
   }
 }
@@ -86,7 +95,10 @@ class SettingsScreen extends GetView<SettingsController> {
         slivers: [
           SliverAppBar.large(
             automaticallyImplyLeading: false,
-            title: Text("settings_title".tr),
+            title: Text(
+              "settings_title".tr,
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
           ),
           Obx(
             () => SliverList(
@@ -123,8 +135,10 @@ class SettingsScreen extends GetView<SettingsController> {
                 ),
                 CheckboxListTile(
                   value: controller.isBlackMode.value,
-                  onChanged: (_) => controller
-                      .onBoolOptionChange(SettingsConstant.BLACK_MODE),
+                  onChanged: controller.isDarkMode.value
+                      ? (_) => controller
+                          .onBoolOptionChange(SettingsConstant.BLACK_MODE)
+                      : null,
                   secondary: const Icon(Icons.dark_mode_outlined),
                   title: Text("settings_title_black".tr),
                   subtitle: Text("settings_subtitle_black".tr),

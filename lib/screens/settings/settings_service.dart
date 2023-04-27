@@ -11,6 +11,12 @@ class SettingService extends GetxService {
 
   Future<SettingService> init() async {
     await GetStorage.init();
+    await updateValues();
+
+    return this;
+  }
+
+  Future<SettingService> updateValues() async {
     isDarkMode =
         (GetStorage().read(SettingsConstant.DARK_MODE)) ?? Get.isDarkMode;
     isBlackMode = (GetStorage().read(SettingsConstant.BLACK_MODE)) ?? false;
