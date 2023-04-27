@@ -2,7 +2,6 @@
 
 import 'dart:ui';
 
-import 'package:avp/core/files_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -26,9 +25,9 @@ class HomePage extends GetView<HomeController> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed: () {
-        Get.updateLocale(const Locale('ja', 'JP'));
-      }),
+      // floatingActionButton: FloatingActionButton(onPressed: () {
+      //   Get.updateLocale(const Locale('zh', 'ZH'));
+      // }),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

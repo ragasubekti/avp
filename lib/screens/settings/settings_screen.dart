@@ -1,4 +1,5 @@
 import 'package:avp/constants/settings.dart';
+import 'package:avp/screens/settings/settings_screen_language_widget.dart';
 import 'package:avp/screens/settings/settings_screen_orientation_widget.dart';
 import 'package:avp/screens/settings/settings_service.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +77,33 @@ class SettingsController extends GetxController {
     );
   }
 
+  onLanguagePressed(BuildContext context) {
+    showModalBottomSheet(
+      context: Get.context ?? context,
+      builder: (BuildContext ctx) {
+        return const SettingScreenLanguageWidget();
+      },
+    );
+  }
+
+  changeSelectedLanguage(int option, BuildContext context) {
+    switch (option) {
+      case 1:
+        Get.updateLocale(const Locale('ja', 'JP'));
+        break;
+      case 2:
+        Get.updateLocale(const Locale('ko', 'KR'));
+        break;
+      case 3:
+        Get.updateLocale(const Locale('zh', 'ZH'));
+        break;
+      default:
+        Get.updateLocale(const Locale('en', 'US'));
+    }
+
+    Navigator.pop(context);
+  }
+
   changeScreenOrientation(int value, BuildContext context) {
     screenOrientation(value);
     box.write(SettingsConstant.SCREEN_ORIENTATION, value);
@@ -144,7 +172,7 @@ class SettingsScreen extends GetView<SettingsController> {
                   subtitle: Text("settings_subtitle_black".tr),
                 ),
                 ListTile(
-                  onTap: null,
+                  onTap: () => controller.onLanguagePressed(context),
                   leading: const Icon(Icons.language),
                   title: Text('settings_title_language'.tr),
                   subtitle: Text('settings_subtitle_language'.tr),

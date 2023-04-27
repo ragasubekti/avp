@@ -33,6 +33,7 @@ class AvpTranslation extends Translations {
           // HOME
           'home_recently_played': 'Recently Played',
           'home_recently_added': 'Recently Added',
+          'home_search_hint': 'Search',
         },
         'ja_JP': {
           // SETTINGS
@@ -61,6 +62,7 @@ class AvpTranslation extends Translations {
           // HOME
           'home_recently_played': '最近再生したもの',
           'home_recently_added': '最近追加したもの',
+          'home_search_hint': '検索',
         },
         'zh_ZH': {
           // SETTINGS
@@ -89,6 +91,7 @@ class AvpTranslation extends Translations {
           // HOME
           'home_recently_played': '最近播放',
           'home_recently_added': '最近添加',
+          'home_search_hint': '搜索',
         },
         'ko_KR': {
           // SETTINGS
@@ -117,6 +120,7 @@ class AvpTranslation extends Translations {
           // HOME
           'home_recently_played': '최근 재생한 것',
           'home_recently_added': '최근 추가된 것',
+          'home_search_hint': '검색',
         },
       };
 }
