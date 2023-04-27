@@ -50,19 +50,14 @@ void addFilesToDb(List<FileSystemEntity> list) async {
     }
 
     if (!dirException.any(pathString.contains) &&
-        !(await findExistingDb(pathString))) {
+        !(await findPathInDb(pathString))) {
       _logger.d(path);
     }
   }
 }
 
-Future<bool> findExistingDb(String path) async {
-  // final db = Get.find<VideoProvider>();
-  final q = await _videoProvider.queryFindFilePath(path);
-
-  _logger.i(q);
-
-  return q.isNotEmpty;
+Future<bool> findPathInDb(String path) async {
+  return await _videoProvider.queryFindFilePath(path).isNotEmpty;
 }
 
 // import 'dart:io';

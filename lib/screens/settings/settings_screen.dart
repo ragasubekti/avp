@@ -143,6 +143,12 @@ class SettingsScreen extends GetView<SettingsController> {
                   title: Text("settings_title_black".tr),
                   subtitle: Text("settings_subtitle_black".tr),
                 ),
+                ListTile(
+                  onTap: null,
+                  leading: const Icon(Icons.language),
+                  title: Text('settings_title_language'.tr),
+                  subtitle: Text('settings_subtitle_language'.tr),
+                ),
               ]),
             ),
           ),
