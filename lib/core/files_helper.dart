@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:avp/core/video_helper.dart';
 import 'package:avp/db/video_provider.dart';
 import 'package:external_path/external_path.dart';
 import 'package:get/get.dart';
@@ -9,7 +10,7 @@ final _logger = Logger();
 final _videoProvider = Get.find<VideoProvider>();
 
 class FilesHelper {
-  static void scanFiles() async {
+  void scanFiles() async {
     final storagePath = await ExternalPath.getExternalStorageDirectories();
 
     for (var path in storagePath) {
@@ -18,47 +19,72 @@ class FilesHelper {
 
       for (var dir in storage) {
         if (!dir.toString().contains("Android")) {
-          recursiveFileLookup(dir);
+          _recursiveFileLookup(dir);
         }
       }
     }
 
     return null;
   }
-}
 
-void recursiveFileLookup(FileSystemEntity path) {
-  if (path is Directory) {
-    final list = path.listSync(recursive: true, followLinks: false).toList();
-    if (list.isNotEmpty) {
-      addFilesToDb(list);
+  void _recursiveFileLookup(FileSystemEntity path) {
+    if (path is Directory) {
+      final list = path.listSync(recursive: true, followLinks: false).toList();
+      if (list.isNotEmpty) {
+        addFilesToDb(list);
+      }
+    } else {
+      _logger.d("PATH `$path` IS FILE");
     }
-  } else {
-    _logger.d("PATH `$path` IS FILE");
+  }
+
+  void addFilesToDb(List<FileSystemEntity> list) async {
+    const exception = [".nomedia", '.thumbnails'];
+    List<String> dirException = [];
+
+    for (var path in list) {
+      final pathString = path.path;
+
+      if (exception.any(pathString.contains)) {
+        dirException.add(pathString);
+      }
+
+      if (_isExcluded(dirException, pathString) &&
+          path is File &&
+          _isVideoFormat(pathString)) {
+        final videoId = await _findPathInDb(pathString);
+
+        if (videoId < 0) {
+          final metadata = await getVideoMetadata(pathString);
+          _logger.w(metadata);
+        }
+      }
+    }
+  }
+
+  bool _isExcluded(List<String> exclusion, String path) {
+    return !exclusion.any(path.contains);
+  }
+
+  bool _isVideoFormat(String path) {
+    return commonVideoFormat.any(path.contains);
+  }
+
+  Future<int> _findPathInDb(String path) async {
+    final query = await _videoProvider.queryFindFilePath(path);
+
+    return query.isNotEmpty ? query.first : -1;
+  }
+
+  String _getDirectoryPath(String path) {
+    List<String> splitFilePath = path.split("/");
+    splitFilePath.removeLast();
+
+    return splitFilePath.join("/");
   }
 }
 
-void addFilesToDb(List<FileSystemEntity> list) async {
-  const exception = [".nomedia", '.thumbnails'];
-  List<String> dirException = [];
 
-  for (var path in list) {
-    final pathString = path.path;
-
-    if (exception.any(pathString.contains)) {
-      dirException.add(pathString);
-    }
-
-    if (!dirException.any(pathString.contains) &&
-        !(await findPathInDb(pathString))) {
-      _logger.d(path);
-    }
-  }
-}
-
-Future<bool> findPathInDb(String path) async {
-  return await _videoProvider.queryFindFilePath(path).isNotEmpty;
-}
 
 // import 'dart:io';
 // // import 'package:sqflite/sqflite.dart';
@@ -107,11 +133,4 @@ Future<bool> findPathInDb(String path) async {
 //   }
 
 //   return thumbnailPath;
-// }
-
-// String getDirectoryPath(String filePath) {
-//   List<String> splitFilePath = filePath.split("/");
-//   splitFilePath.removeLast();
-
-//   return splitFilePath.join("/");
 // }
