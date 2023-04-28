@@ -26,8 +26,8 @@ dependencies:
 
 
   # MEDIA KIT
-  media_kit: ^0.0.5
-  media_kit_video: ^0.0.7
+  media_kit: ^0.0.7
+  media_kit_video: ^0.0.9
 
   media_kit_libs_android_video: ^1.0.2
     
