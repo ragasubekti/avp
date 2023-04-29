@@ -70,7 +70,8 @@ class SettingsController extends GetxController {
 
   onScreenOrientationPressed(BuildContext context) {
     showModalBottomSheet(
-      context: Get.context ?? context,
+      useRootNavigator: true,
+      context: context,
       builder: (BuildContext ctx) {
         return const SettingScreenOrientationWidget();
       },
@@ -79,7 +80,8 @@ class SettingsController extends GetxController {
 
   onLanguagePressed(BuildContext context) {
     showModalBottomSheet(
-      context: Get.context ?? context,
+      useRootNavigator: true,
+      context: context,
       builder: (BuildContext ctx) {
         return const SettingScreenLanguageWidget();
       },
