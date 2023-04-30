@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:ffmpeg_kit_flutter_min_gpl/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_min_gpl/ffprobe_kit.dart';
-import 'package:ffmpeg_kit_flutter_min_gpl/return_code.dart';
+import 'package:ffmpeg_kit_flutter_video/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_video/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter_video/return_code.dart';
 
 import 'package:logger/logger.dart';
 
@@ -41,9 +41,10 @@ Future<String?> generateThumbnail(String filePath) async {
       "$file.jpeg",
     ];
 
-    return FFmpegKit.executeWithArguments(ffmpegArgs).then((session) async {
+    return FFmpegKit.executeWithArguments(ffmpegArgs)
+        .then((session) async {
       final returnCode = await session.getReturnCode();
-      // logger.d(await session.getAllLogsAsString());
+      logger.d(await session.getAllLogsAsString());
 
       return ReturnCode.isSuccess(returnCode) ? "$file.jpeg" : null;
     });
@@ -69,7 +70,7 @@ Future<String> getVideoResolution(String filePath) async {
       .then((value) async {
     final resolution = await value.getLogsAsString();
 
-    return resolution;
+    return resolution.trim();
   });
 }
 
@@ -94,13 +95,42 @@ Future<String> getVideoFormat(String filePath) async {
   });
 }
 
-Future<VideoMetadataInfo> getVideoMetadata(String filePath) async {
-  final ffprobe = await FFprobeKit.getMediaInformation(filePath);
+Future<int> getVideoDuration(String path) async {
+  final ffprobe = await FFprobeKit.getMediaInformation(path);
   final mediaInfo = ffprobe.getMediaInformation();
 
+  return double.parse(mediaInfo?.getDuration() ?? "0").toInt();
+}
+
+// Future<int> getVideoDuration(String path) async {
+//   final args = [
+//     "-v",
+//     "error",
+//     "-select_streams",
+//     "v:0",
+//     "-show_entries",
+//     "stream=duration",
+//     "-of",
+//     "default=noprint_wrappers=1:nokey=1",
+//     path,
+//   ];
+//
+//   return FFprobeKit.executeWithArguments(args).then((value) async {
+//     logger.wtf(path);
+//     final duration = await value.getLogsAsString();
+//
+//     try {
+//       return double.parse(duration.trim()).toInt();
+//     } catch (e) {
+//       return int.parse(duration.trim());
+//     }
+//   });
+// }
+
+Future<VideoMetadataInfo> getVideoMetadata(String filePath) async {
   final String format = await getVideoFormat(filePath);
-  final int duration = double.parse(mediaInfo!.getDuration() ?? "0").toInt();
-  String resolution = (await getVideoResolution(filePath)).trim();
+  final int duration = await getVideoDuration(filePath);
+  final String resolution = await getVideoResolution(filePath);
 
   return VideoMetadataInfo(format, duration, resolution);
 }

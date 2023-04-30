@@ -1,15 +1,19 @@
 import 'dart:io';
 
 import 'package:avp/core/video_helper.dart';
-import 'package:avp/db/video_provider.dart';
+import 'package:avp/db/schema/videos.dart';
+import 'package:avp/db/videos_provider.dart';
 import 'package:external_path/external_path.dart';
 import 'package:get/get.dart';
+import 'package:isar/isar.dart';
 import 'package:logger/logger.dart';
 
 final _logger = Logger();
-final _videoProvider = Get.find<VideoProvider>();
+final _isar = Get.find<VideosProvider>();
 
 class FilesHelper {
+  final isar = _isar.isar;
+
   void scanFiles() async {
     final storagePath = await ExternalPath.getExternalStorageDirectories();
 
@@ -52,14 +56,38 @@ class FilesHelper {
       if (_isExcluded(dirException, pathString) &&
           path is File &&
           _isVideoFormat(pathString)) {
-        final videoId = await _findPathInDb(pathString);
+        final existsInDb = await _findPathInDb(pathString);
+        logger.w("EXISTS_IN_DB: $existsInDb");
 
-        if (videoId < 0) {
-          final metadata = await getVideoMetadata(pathString);
-          _logger.w(metadata);
+        if (existsInDb) {
+          // final metadata = await getVideoMetadata(pathString);
+          // _logger.w(metadata);
+          // _processFile(pathString);
+        } else {
+          // await _processFile(pathString);
         }
       }
     }
+  }
+
+  Future _processFile(String path) async {
+    final metadata = await getVideoMetadata(path);
+    final thumbnail = await generateThumbnail(path);
+
+    final newFile = Videos()
+      ..filePath = path
+      ..codecs = metadata.format
+      ..resolution = metadata.resolution
+      ..duration = metadata.duration
+      ..thumbnailPath = thumbnail
+      ..watchedDuration = 0
+      ..name = getVideoFilename(path)
+      ..directoryPath = _getDirectoryPath(path);
+
+    await isar.writeTxn(() async {
+      final result = await isar.collection<Videos>().put(newFile);
+      _logger.d(result);
+    });
   }
 
   bool _isExcluded(List<String> exclusion, String path) {
@@ -70,10 +98,10 @@ class FilesHelper {
     return commonVideoFormat.any(path.contains);
   }
 
-  Future<int> _findPathInDb(String path) async {
-    final query = await _videoProvider.queryFindFilePath(path);
+  Future<bool> _findPathInDb(String path) async {
+    final query = isar.collection<Videos>().filter().filePathEqualTo(path);
 
-    return query.isNotEmpty ? query.first : -1;
+    return (await query.count()) > 0;
   }
 
   String _getDirectoryPath(String path) {
