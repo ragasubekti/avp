@@ -1,6 +1,7 @@
 import 'package:avp/db/videos_provider.dart';
 import 'package:avp/screens/settings/settings_service.dart';
 import 'package:avp/screens/video_player/video_player_screen.dart';
+import 'package:avp/screens_tv/init/init.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -15,6 +16,12 @@ void main() async {
 
   await initializeConfig();
   runApp(Avp());
+}
+
+bool isDeviceLarge(BuildContext context) {
+  final width = MediaQuery.of(context).size.shortestSide;
+
+  return width >= 550;
 }
 
 Future<void> initializeConfig() async {
@@ -39,18 +46,26 @@ class Avp extends StatelessWidget {
       themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       defaultTransition: Transition.native,
       initialRoute: "/init",
-      getPages: [
-        GetPage(
-          name: '/init',
-          page: () => const InitPage(),
-          binding: InitBinding(),
-        ),
-        GetPage(
-          name: "/player",
-          page: () => VideoPlayerPage(),
-          binding: VideoPlayerBinding(),
-        ),
-      ],
+      getPages: isDeviceLarge(context)
+          ? [
+              GetPage(
+                name: '/init',
+                page: () => const InitLargePage(),
+                binding: InitLargeBinding(),
+              ),
+            ]
+          : [
+              GetPage(
+                name: '/init',
+                page: () => const InitPage(),
+                binding: InitBinding(),
+              ),
+              GetPage(
+                name: "/player",
+                page: () => VideoPlayerPage(),
+                binding: VideoPlayerBinding(),
+              ),
+            ],
     );
   }
 }
